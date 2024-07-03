@@ -1,0 +1,35 @@
+﻿@page
+@model assetWebApi.Pages.Company.IndexModel
+@{
+}
+
+<!-- Chosen CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" rel="stylesheet">
+
+<!-- jQuery (if not already included) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Chosen JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+
+
+@Html.LabelFor(m => m.SelectedUserRoleId)
+<select id="userRole" asp-for="SelectedUserRoleId" class="form-control" style="width: 100%;">
+    <option value="">- Please select a User Role -</option>
+    @foreach (var role in Model.UserRoles)
+    {
+        <option value="@role.Value">@role.Text</option>
+    }
+</select>
+
+<!-- Add the following script to enable Select2 -->
+<script>
+    $(document).ready(function () {
+        $('#userRole').chosen({
+            placeholder_text_single: "- Please select a User Role -",
+            width: '100%'
+        });
+    });
+</script>
+
+

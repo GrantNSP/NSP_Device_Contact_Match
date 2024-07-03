@@ -1,0 +1,91 @@
+﻿@page "/"
+@model assetWebApi.Pages.Asset.AssetModel
+@{
+    ViewData["Title"] = "Asset Contact List";
+}
+<h1>@ViewData["Title"]</h1>
+<br>
+<br>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<table id="Asset" class="table" style="width:100%">
+    <thead>
+        <tr>
+            <th class="Keyid_hdr">Key ID</th>
+            <th>N-Central ID</th>
+            <th>Company Name</th>
+            <th>Asset Name</th>
+            <th>Last Login User</th>
+            <th>Last Sync User</th>
+            <th>Contact ID</th>
+            <th>Contact Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach( var item in Model.listAsset)
+        {
+            <tr>
+                <td class="Keyid">@item.Keyid</td>
+                <td>@item.nCentralId</td>
+                <td>@item.companyName</td>
+                <td>@item.assetName</td>
+                <td>@item.lastUser</td>
+                <td>@item.lastSync</td>
+                <td>@item.contactId</td>
+                <td>@item.contactName</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="/Asset/Edit?Keyid=@item.Keyid">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <th class="Keyid_hdr">Key ID</th>
+            <th>N-Central ID</th>
+            <th>Company Name</th>
+            <th>Asset Name</th>
+            <th>Last Login User</th>
+            <th>Last Sync User</th>
+            <th>Contact ID</th>
+            <th>Contact Name</th>
+            <th></th>
+        </tr>
+    </tfoot>
+</table>
+
+<script>
+     let table = new DataTable('#Asset', {
+        columns: [
+            { data: 'KeyID' },
+            { data: 'nCentralId' },
+            { data: 'companyName' },
+            { data: 'assetName' },
+            { data: 'lastUser' },
+            { data: 'lastSync' },
+            { data: 'contactId' },
+            { data: 'contactName'},
+            {}
+        ],
+        order: [[0, 'desc']]
+    });
+</script>
+
+<style>
+    table, td, th {
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th.Keyid_hdr, td.Keyid {
+        display: none;
+    }
+</style>

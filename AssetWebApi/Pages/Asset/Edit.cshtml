@@ -1,0 +1,97 @@
+﻿@page
+@model assetWebApi.Pages.Asset.EditModel
+@{
+    ViewData["Title"] = "Edit Asset";
+}
+<!-- Chosen CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" rel="stylesheet">
+
+<!-- jQuery (if not already included) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Chosen JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+
+<h1>@ViewData["Title"]</h1>
+<br>
+@if (Model.errorMessage.Length > 0)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>@Model.errorMessage</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<form method="post">
+    <input type="hidden" name="id" value="@Model.assetInput.Keyid">
+    <div class="row mb-3">
+        <label class="col-sm-3 col-form-label">Ncentral ID:</label>
+        <div class="col-sm-6">
+            <input type="text" class="form-control" name="NCID" value="@Model.assetInput.nCentralId" placeholder="N-Central ID" disabled>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label class="col-sm-3 col-form-label">Asset Name:</label>
+        <div class="col-sm-6">
+            <input type="text" class="form-control" name="ASNAME" value="@Model.assetInput.assetName" placeholder="Asset Name" disabled>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label class="col-sm-3 col-form-label">Last Login User:</label>
+        <div class="col-sm-6">
+            <input type="text" class="form-control" name="LSLOGU" value="@Model.assetInput.lastUser" placeholder="Last Login User" disabled>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label class="col-sm-3 col-form-label">Last Sync User:</label>
+        <div class="col-sm-6">
+            <input type="text" class="form-control" name="LSSYNC" value="@Model.assetInput.lastSync" placeholder="Last Sync User" disabled>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label class="col-sm-3 col-form-label">Contact Name:</label>
+        <div class="col-sm-6">
+            <select id="userRole" name= "COID" class="form-control" style="width: 100%;">
+                <option value="">- Please select a Contact -</option>
+                @if (Model.UserRoles != null && Model.UserRoles.Any())
+                {
+                    foreach (var role in Model.UserRoles)
+                    {
+                        <option value="@role.Value">@role.Text</option>
+                    }
+                }
+else
+{
+    <option value="">No roles available</option>
+}
+
+            </select>
+        </div>
+    </div>
+
+    @if (Model.successMessage.Length > 0)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>@Model.successMessage</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row mb-3">
+        <div class="offset-sm-3 col-sm-3 d-grid">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+        <div class="col-sm-3 d-grid">
+            <a class="btn btn-primary" href="/" role="button">Back</a>
+        </div>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $('#userRole').chosen({
+            placeholder_text_single: "- Please select a Contact -",
+            width: '100%'
+        });
+        var selectedValue = $(this).val(); // Get the selected value
+    });
+</script>
