@@ -5,7 +5,6 @@
 }
 <h1>@ViewData["Title"]</h1>
 <br>
-<br>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
@@ -18,7 +17,7 @@
             <th>N-Central ID</th>
             <th>Company Name</th>
             <th>Asset Name</th>
-            <th>Last Login User</th>
+            <th>Current Sync User</th>
             <th>Last Sync User</th>
             <th>Contact ID</th>
             <th>Contact Name</th>
@@ -33,7 +32,7 @@
                 <td>@item.nCentralId</td>
                 <td>@item.companyName</td>
                 <td>@item.assetName</td>
-                <td>@item.lastUser</td>
+                <td>@item.currentSync</td>
                 <td>@item.lastSync</td>
                 <td>@item.contactId</td>
                 <td>@item.contactName</td>
@@ -49,7 +48,7 @@
             <th>N-Central ID</th>
             <th>Company Name</th>
             <th>Asset Name</th>
-            <th>Last Login User</th>
+            <th>Current Sync User</th>
             <th>Last Sync User</th>
             <th>Contact ID</th>
             <th>Contact Name</th>
@@ -65,13 +64,17 @@
             { data: 'nCentralId' },
             { data: 'companyName' },
             { data: 'assetName' },
-            { data: 'lastUser' },
+            { data: 'currentSync'},
             { data: 'lastSync' },
             { data: 'contactId' },
             { data: 'contactName'},
             {}
         ],
-        order: [[0, 'desc']]
+        order: [[2, 'asc']],
+        lengthMenu: [
+        [10, 25, 50, 75], // Values
+        [10, 25, 50, 75] // Labels
+        ]
     });
 </script>
 

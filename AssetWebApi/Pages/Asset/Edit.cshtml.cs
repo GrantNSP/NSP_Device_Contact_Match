@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace assetWebApi.Pages.Asset
 {
@@ -18,7 +20,7 @@ namespace assetWebApi.Pages.Asset
 
         [Display(Name = "User Role")]
         public int SelectedUserRoleId { get; set; }
-        public IEnumerable<SelectListItem> UserRoles { get; set; }
+        public IEnumerable<SelectListItem> contacts { get; set; }
         public void OnGet()
         {
             string Keyid = Request.Query["Keyid"];
@@ -32,7 +34,7 @@ namespace assetWebApi.Pages.Asset
                 using (SqlConnection conn = new SqlConnection(connString))
                 {
                     conn.Open();
-                    using (SqlCommand cmd = new SqlCommand("SELECT [N-Central ID],[AssetName],[LastUser],[LastSyncUser],[ContactID],[ContactName],[Company ID] FROM [Asset].[dbo].[AssetContact] WHERE [Key id] = " + Keyid, conn))
+                    using (SqlCommand cmd = new SqlCommand("SELECT [N-Central ID],[AssetName],[CurrentSyncUser],[LastSyncUser],[ContactID],[ContactName],[Company ID] FROM [Asset].[dbo].[AssetContact] WHERE [Key id] = " + Keyid, conn))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -40,7 +42,7 @@ namespace assetWebApi.Pages.Asset
                             {
                                 assetInput.nCentralId = reader.GetString(0);
                                 assetInput.assetName = reader.GetString(1);
-                                assetInput.lastUser = reader.GetString(2);
+                                assetInput.currentSync = reader.GetString(2);
                                 assetInput.lastSync = reader.GetString(3);
                                 assetInput.contactId = reader.GetString(4);
                                 assetInput.contactName = reader.GetString(5);
@@ -50,6 +52,7 @@ namespace assetWebApi.Pages.Asset
                     }
                     conn.Close();
                 }
+
                 // Get data pertaining name and id of contact
                 getData(companyId).Wait();
             }
@@ -60,7 +63,7 @@ namespace assetWebApi.Pages.Asset
             }
 
             // put contacts in an inumerable list
-            UserRoles = GeContacts();
+            contacts = GeContacts();
         }
 
         private async Task getData(string companyId)
@@ -107,7 +110,7 @@ namespace assetWebApi.Pages.Asset
             return roles;
         }
 
-        private async Task sendData(string contactId)
+        private async Task sendData(string contactId, string nCentralAssetId)
         {
             // get name from AutotaskAPI
             string userName = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["AutotaskUserNameConnection"];
@@ -146,6 +149,46 @@ namespace assetWebApi.Pages.Asset
                 {
                     Console.WriteLine(ex);
                 }
+
+                try
+                {
+                    string assetIdUrl = "https://webservices6.autotask.net/ATServicesRest/V1.0/ConfigurationItems/query?search={ \"filter\":[ {\"op\":\"eq\", \"field\":\"N-central Device ID\",\"udf\":true,\"value\":\"" + nCentralAssetId + "\"}]}";
+
+                    var response2 = await client.GetAsync(assetIdUrl);
+
+                    var content2 = await response2.Content.ReadAsStringAsync();
+
+                    dynamic assetData = JObject.Parse(content2);
+
+                    if(assetData.items.Count > 0)
+                    {
+                        int ATID = assetData.items[0].id;
+
+                        updateAsset ua = new updateAsset()
+                        {
+                            id = ATID,
+                            contactId = contactId
+                        };
+
+                        string stringJson = JsonConvert.SerializeObject(ua, Formatting.Indented);
+
+                        var stringContent = new StringContent(stringJson, Encoding.UTF8, "application/json");
+
+                        Console.WriteLine(stringJson);
+
+                        string assetUrl = "https://webservices6.autotask.net/ATServicesRest/V1.0/ConfigurationItems";
+
+                        response2 = await client.PatchAsync(assetUrl, stringContent);
+
+                        content2 = await response2.Content.ReadAsStringAsync();
+
+                        Console.WriteLine(content2);
+                    } 
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
         }
 
@@ -155,7 +198,9 @@ namespace assetWebApi.Pages.Asset
 
             assetInput.contactId = Request.Form["COID"];
 
-            sendData(assetInput.contactId).Wait();
+            assetInput.nCentralId = Request.Form["NCID"];
+
+            sendData(assetInput.contactId, assetInput.nCentralId).Wait();
 
             try
             {
@@ -177,6 +222,8 @@ namespace assetWebApi.Pages.Asset
                 return;
             }
 
+
+
             Response.Redirect("/",false);
         }
     }
@@ -184,5 +231,11 @@ namespace assetWebApi.Pages.Asset
     {
         public int contactId;
         public string contactName;
+    }
+
+    public class updateAsset
+    {
+        public int id;
+        public string? contactId;
     }
 }
