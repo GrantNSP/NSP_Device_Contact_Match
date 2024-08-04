@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data.SqlClient;
 
-namespace assetWebApi.Pages.Asset
+namespace assetWebApi.Pages.AssetNonMatch
 {
-    public class AssetModel : PageModel
+    public class AssetNonMatchModel : PageModel
     {
-        public List<assetData> listAsset = new List<assetData>();
+        public List<assetData> listAssetMatch = new List<assetData>();
         public void OnGet()
         {
             try
@@ -15,7 +15,7 @@ namespace assetWebApi.Pages.Asset
                 using (SqlConnection conn = new SqlConnection(connString))
                 {
                     conn.Open();
-                    using (SqlCommand cmd = new SqlCommand("SELECT [Key Id],[N-Central ID],[CompanyName],[AssetName],[CurrentSyncUser],[LastSyncUser],[ContactID],[ContactName] FROM [Asset].[dbo].[AssetContact]", conn))
+                    using (SqlCommand cmd = new SqlCommand("SELECT [Key Id],[N-Central ID],[CompanyName],[AssetName],[CurrentSyncUser],[LastSyncUser],[ContactID],[ContactName] FROM [Asset].[dbo].[AssetContact] WHERE [ContactID] = '0' AND [Filtered] = 0", conn))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -31,7 +31,7 @@ namespace assetWebApi.Pages.Asset
                                 cAsset.contactId = reader.GetString(6);
                                 cAsset.contactName = reader.GetString(7);
 
-                                listAsset.Add(cAsset);
+                                listAssetMatch.Add(cAsset);
                             }
                         }
                     }
@@ -43,7 +43,6 @@ namespace assetWebApi.Pages.Asset
             }
         }
     }
-
     public class assetData
     {
         public int Keyid;

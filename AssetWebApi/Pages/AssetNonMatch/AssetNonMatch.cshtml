@@ -1,7 +1,7 @@
 ﻿@page "/"
-@model assetWebApi.Pages.Asset.AssetModel
+@model assetWebApi.Pages.AssetNonMatch.AssetNonMatchModel
 @{
-    ViewData["Title"] = "Asset Contact List";
+    ViewData["Title"] = "Non-Matched Devices List";
 }
 <h1>@ViewData["Title"]</h1>
 <br>
@@ -25,7 +25,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach( var item in Model.listAsset)
+        @foreach( var item in Model.listAssetMatch)
         {
             <tr>
                 <td class="Keyid">@item.Keyid</td>
@@ -37,7 +37,8 @@
                 <td>@item.contactId</td>
                 <td>@item.contactName</td>
                 <td>
-                    <a class="btn btn-primary btn-sm" href="/Asset/Edit?Keyid=@item.Keyid">Edit</a>
+                    <a class="btn btn-primary btn-sm" href="/AssetNonMatch/Edit?Keyid=@item.Keyid">Edit</a>
+                    <a class="btn btn-danger btn-sm" href="/AssetNonMatch/Filter?Keyid=@item.Keyid">Ignore</a>
                 </td>
             </tr>
         }
@@ -58,7 +59,8 @@
 </table>
 
 <script>
-     let table = new DataTable('#Asset', {
+     let table = new DataTable('#Asset', 
+     {
         columns: [
             { data: 'KeyID' },
             { data: 'nCentralId' },
@@ -71,10 +73,23 @@
             {}
         ],
         order: [[2, 'asc']],
+        pageLength: 75,
         lengthMenu: [
         [10, 25, 50, 75], // Values
         [10, 25, 50, 75] // Labels
-        ]
+        ],
+        rowCallback: function(row, data) 
+        {
+            // Check if the contactId column contains the string "0"
+            if (data.contactName.toString().includes("No Match")) 
+            {
+                $(row).css('background-color', 'red'); // Change the color to yellow
+            }
+            else if (data.contactName.toString().includes("Multiple Match"))
+            {
+                $(row).css('background-color', 'yellow');
+            }
+        }
     });
 </script>
 
@@ -90,5 +105,9 @@
     }
     th.Keyid_hdr, td.Keyid {
         display: none;
+    }
+
+    .red{
+        background-color: red !important;
     }
 </style>

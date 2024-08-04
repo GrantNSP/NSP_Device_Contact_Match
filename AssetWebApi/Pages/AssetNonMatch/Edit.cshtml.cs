@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Text;
 
-namespace assetWebApi.Pages.Asset
+namespace assetWebApi.Pages.AssetNonMatch
 {
     public class EditModel : PageModel
     {
@@ -222,7 +222,7 @@ namespace assetWebApi.Pages.Asset
                 return;
             }
 
-            Response.Redirect("/Asset/AssetFull",false);
+            Response.Redirect("/", false);
         }
     }
     public class contacts

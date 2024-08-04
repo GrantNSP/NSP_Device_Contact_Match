@@ -100,6 +100,7 @@ namespace assetsAndContacts
             string autotaskCompanyId;
             string companyName;
             int result = 1000;
+            int filtered = 0;
 
             string possibleMatches = "";
             string firstName = "";
@@ -111,7 +112,7 @@ namespace assetsAndContacts
                 connWarehouse.Open();
                 //SqlCommand cmd = new SqlCommand("SELECT c1.[customerid],c1.[customername],c1.[psacustomername] FROM [ods_smarti_ds1].[dbo].[customer] c1 LEFT JOIN [ods_smarti_ds1].[dbo].customer c2 ON c1.parentid = c2.customerid WHERE c1.deleted = 0 AND c1.psacustomername != '' and c1.parentid != 257 and c1.parentid != 392 and c1.[parentid] != 1 and c2.parentid != 392 and c1.customerid != 254 AND c1.customerid !=341 AND c1.customerid != 257 AND c1.parentid != 229 ORDER BY c1.customerName ASC", connWarehouse);
                 //SqlCommand cmd = new SqlCommand("SELECT c1.[customerid],c1.[customername],c1.[psacustomername] FROM [ods_smarti_ds1].[dbo].[customer] c1 LEFT JOIN [ods_smarti_ds1].[dbo].customer c2 ON c1.parentid = c2.customerid WHERE c1.deleted = 0 AND c1.psacustomername != '' and c1.parentid != 257 and c1.parentid != 392 and c1.[parentid] != 1 and c2.parentid != 392 and c1.customerid != 254 AND c1.customerid !=341 AND c1.customerid != 257 AND c1.parentid != 229 AND (c1.customername LIKE '%Betta%' OR c1.customername LIKE '%Antipodes%')", connWarehouse);
-                SqlCommand cmd = new SqlCommand("SELECT c1.[customerid],c1.[customername],c1.[psacustomername] FROM [ods_smarti_ds1].[dbo].[customer] c1 LEFT JOIN [ods_smarti_ds1].[dbo].customer c2 ON c1.parentid = c2.customerid WHERE c1.deleted = 0 AND c1.psacustomername != '' and c1.parentid != 257 and c1.parentid != 392 and c1.[parentid] != 1 and c2.parentid != 392 and c1.customerid != 254 AND c1.customerid !=341 AND c1.customerid != 257 AND c1.parentid != 229 AND (c1.customername LIKE '%Corban%' OR c1.customername LIKE '%Antipodes%' OR c1.customername LIKE '%Good%S%' OR c1.customername LIKE '%H2R%')", connWarehouse);
+                SqlCommand cmd = new SqlCommand("SELECT c1.[customerid],c1.[customername],c1.[psacustomername] FROM [ods_smarti_ds1].[dbo].[customer] c1 LEFT JOIN [ods_smarti_ds1].[dbo].customer c2 ON c1.parentid = c2.customerid WHERE c1.deleted = 0 AND c1.psacustomername != '' and c1.parentid != 257 and c1.parentid != 392 and c1.[parentid] != 1 and c2.parentid != 392 and c1.customerid != 254 AND c1.customerid !=341 AND c1.customerid != 257 AND c1.parentid != 229 AND (c1.customername LIKE '%Antipodes%' OR c1.customername LIKE '%Corban%')", connWarehouse);
 
                 using (SqlDataReader reader1 = cmd.ExecuteReader())
                 {
@@ -141,6 +142,8 @@ namespace assetsAndContacts
                                 using (SqlConnection connAsset = new SqlConnection(connStringAsset))
                                 {
                                     connAsset.Open();
+
+                                    //Check if Device already exist in the database
                                     SqlCommand cmd3 = new SqlCommand("SELECT COUNT(*) FROM [Asset].[dbo].[AssetContact] WHERE [N-Central ID] = " + nCentralAssetId, connAsset);
 
                                     using (SqlDataReader reader3 = cmd3.ExecuteReader())
@@ -155,31 +158,51 @@ namespace assetsAndContacts
 
                                     if (result == 0) // if not available make a new entry where last login user = last sync user
                                     {
-                                        cmd3 = new SqlCommand("INSERT INTO [Asset].dbo.[AssetContact] ([N-Central ID],[Company ID],[CompanyName],[AssetName],[CurrentSyncUser],[LastSyncUser],[contactId],[contactName]) VALUES (" + nCentralAssetId + ",'" + autotaskCompanyId + "','" + companyName + "','" + assetName + "','" + currentSyncUser + "','No Previous Sync',0,'No Match')", connAsset);
+                                        cmd3 = new SqlCommand("INSERT INTO [Asset].dbo.[AssetContact] ([N-Central ID],[Company ID],[CompanyName],[AssetName],[CurrentSyncUser],[LastSyncUser],[contactId],[contactName],[Filtered]) VALUES (" + nCentralAssetId + ",'" + autotaskCompanyId + "','" + companyName + "','" + assetName + "','" + currentSyncUser + "','No Previous Sync',0,'No Match',0)", connAsset);
                                         cmd3.ExecuteNonQuery();
                                         LogToFile(assetName + " is new, added to database");
                                     }
-                                    else // Check if last sync user = last login user
+                                    else 
                                     {
-                                        cmd3 = new SqlCommand("SELECT [CurrentSyncUser] FROM [Asset].[dbo].[AssetContact] WHERE [N-Central ID] = " + nCentralAssetId, connAsset);
+                                        //Check if Device is filtered
+                                        cmd3 = new SqlCommand("SELECT COUNT(*) FROM [Asset].[dbo].[AssetContact] WHERE [N-Central ID] = " + nCentralAssetId + " AND [Filtered] = 1", connAsset);
 
-                                        using (SqlDataReader reader4 = cmd3.ExecuteReader())
+                                        using (SqlDataReader reader3 = cmd3.ExecuteReader())
                                         {
-                                            while (reader4.Read())
+                                            while (reader3.Read())
                                             {
-                                                previousSyncUser = reader4.GetString(0);
+                                                filtered = reader3.GetInt32(0);
                                             }
                                         }
 
-                                        if (!previousSyncUser.Equals(currentSyncUser)) // Update Data in SQL
+                                        Console.WriteLine("Filter: " + filtered);
+
+                                        if (filtered != 1)// Check if last sync user = last login user
                                         {
-                                            cmd3 = new SqlCommand("UPDATE [Asset].[dbo].[AssetContact] SET [CurrentSyncUser] = '" + currentSyncUser + "',[LastSyncUser] = '" + previousSyncUser + "' WHERE [N-Central ID] = " + nCentralAssetId, connAsset);
-                                            cmd3.ExecuteNonQuery();
-                                            LogToFile("Updating " + assetName + "with new login user " + currentSyncUser);
+                                            cmd3 = new SqlCommand("SELECT [CurrentSyncUser] FROM [Asset].[dbo].[AssetContact] WHERE [N-Central ID] = " + nCentralAssetId, connAsset);
+
+                                            using (SqlDataReader reader4 = cmd3.ExecuteReader())
+                                            {
+                                                while (reader4.Read())
+                                                {
+                                                    previousSyncUser = reader4.GetString(0);
+                                                }
+                                            }
+
+                                            if (!previousSyncUser.Equals(currentSyncUser)) // Update Data in SQL
+                                            {
+                                                cmd3 = new SqlCommand("UPDATE [Asset].[dbo].[AssetContact] SET [CurrentSyncUser] = '" + currentSyncUser + "',[LastSyncUser] = '" + previousSyncUser + "' WHERE [N-Central ID] = " + nCentralAssetId, connAsset);
+                                                cmd3.ExecuteNonQuery();
+                                                LogToFile("Updating " + assetName + "with new login user " + currentSyncUser);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            LogToFile(assetName + " is Filtered");
                                         }
                                     }
 
-                                    if (result == 0 || !previousSyncUser.Equals(currentSyncUser)) // if data was not available hence result = 0 or current last login user is not the same as last sync user, GET Company ID
+                                    if ((result == 0 || !previousSyncUser.Equals(currentSyncUser)) && filtered != 1) // if data was not available hence result = 0 or current last login user is not the same as last sync user, GET Company ID
                                     {
                                         // try match with available contacts
                                         string contactApiUrlCompany = "https://webservices6.autotask.net/ATServicesRest/V1.0/Contacts/query?search={\"filter\":[{\"op\":\"eq\", \"field\":\"companyID\",\"value\":\"" + autotaskCompanyId + "\"},{\"op\":\"contains\", \"field\":\"emailAddress\",\"value\":\"" + currentSyncUser + "\"},{\"op\":\"eq\", \"field\":\"isActive\",\"value\":\"1\"}]}";
@@ -204,8 +227,7 @@ namespace assetsAndContacts
                                                     LogToFile(possibleMatches + " for " + assetName + " trying SQL search");
 
                                                     //SQL search using Report6 warehouse
-
-                                                    using(SqlConnection connReport = new SqlConnection(connStringReport6))
+                                                    using (SqlConnection connReport = new SqlConnection(connStringReport6))
                                                     {
                                                         connReport.Open();
                                                         string modifyCurrentSyncUser = "%" + string.Join("%", currentSyncUser.ToCharArray()) + "%";
@@ -247,7 +269,7 @@ namespace assetsAndContacts
 
                                                             await Task.WhenAll(sendDataToAutotask(nCentralAssetId, assetName, firstName, lastName, userName, secret, apiIntegrationCode, autotaskContactId));
                                                         }
-                                                        else if( result > 1)
+                                                        else if (result > 1)
                                                         {
                                                             Console.WriteLine(currentSyncUser + " has more than 1 match");
                                                             LogToFile(currentSyncUser + " has more than 1 match");
@@ -336,13 +358,13 @@ namespace assetsAndContacts
             }
 
             // check every stored asset and check if they are still online
-
             using (SqlConnection connAsset = new SqlConnection(connStringAsset))
             {
                 connAsset.Open();
                 SqlCommand cmd3 = new SqlCommand("SELECT [N-Central ID],[AssetName] FROM [Asset].[dbo].[AssetContact]", connAsset);
                 bool deleted = true;
                 int unmanaged = 0;
+                int exist = 0;
 
                 using (SqlDataReader reader3 = cmd3.ExecuteReader())
                 {
@@ -358,8 +380,20 @@ namespace assetsAndContacts
                         {
                             connWarehouse.Open();
 
+                            //check if exist
+                            SqlCommand cmd4 = new SqlCommand("SELECT COUNT(*) FROM [ods_smarti_ds1].[dbo].[device] WHERE deviceid = " + nCentralAssetId, connWarehouse);
+                            using (SqlDataReader reader4 = cmd4.ExecuteReader())
+                            {
+                                while(reader4.Read())
+                                {
+                                    exist = reader4.GetInt32(0);
+                                }
+                            }
+
+                            Console.WriteLine("Exist: " + exist);
+
                             //check if it's deleted
-                            SqlCommand cmd4 = new SqlCommand("SELECT [deleted] FROM [ods_smarti_ds1].[dbo].[device] WHERE deviceid = " + nCentralAssetId, connWarehouse);
+                            cmd4 = new SqlCommand("SELECT [deleted] FROM [ods_smarti_ds1].[dbo].[device] WHERE deviceid = " + nCentralAssetId, connWarehouse);
 
                             using (SqlDataReader reader4 = cmd4.ExecuteReader())
                             {
@@ -384,10 +418,10 @@ namespace assetsAndContacts
 
                             Console.WriteLine("Unmanaged: " + unmanaged);
 
-                            if (deleted || unmanaged > 0)
+                            if (deleted || unmanaged > 0 || exist < 1)
                             {
                                 Console.WriteLine("Delete " + nCentralAssetId);
-                                LogToFile(assetName + " is deleted or unmanaged");
+                                LogToFile(assetName + " is deleted, unmanaged or don't exist");
                                 SqlCommand cmd5 = new SqlCommand("DELETE FROM [Asset].[dbo].[AssetContact] WHERE [N-Central ID] = " + nCentralAssetId, connAsset);
                                 cmd5.ExecuteNonQuery();
                             }
@@ -419,7 +453,6 @@ namespace assetsAndContacts
                 Console.WriteLine("Count: " + assetData.items.Count);
 
                 // add if statement for Count of data in
-
                 if (assetData.items.Count > 0)
                 {
                     int ATID = assetData.items[0].id;

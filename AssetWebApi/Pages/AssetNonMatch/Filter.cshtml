@@ -1,0 +1,30 @@
+﻿@page
+@using System.Data.SqlClient;
+@{
+    try
+    {
+        string Keyid = Request.Query["Keyid"];
+
+        string assetName = "";
+        string assetId = "";
+
+        string connString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
+
+        using (SqlConnection conn = new SqlConnection(connString))
+        {
+            conn.Open();
+
+            using (SqlCommand cmd = new SqlCommand("UPDATE [Asset].[dbo].[AssetContact] SET [Filtered] = 1 WHERE [Key id] = " + Keyid, conn))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            conn.Close();
+        }
+    }
+    catch(Exception ex)
+    {
+
+    }
+
+    Response.Redirect("/");
+}

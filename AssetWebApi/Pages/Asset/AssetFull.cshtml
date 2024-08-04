@@ -1,0 +1,109 @@
+﻿@page ""
+@model assetWebApi.Pages.Asset.AssetFullModel
+@{
+    ViewData["Title"] = "Full Devices List";
+}
+<h1>@ViewData["Title"]</h1>
+<br>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<table id="Asset" class="table" style="width:100%">
+    <thead>
+        <tr>
+            <th class="Keyid_hdr">Key ID</th>
+            <th>N-Central ID</th>
+            <th>Company Name</th>
+            <th>Asset Name</th>
+            <th>Current Sync User</th>
+            <th>Last Sync User</th>
+            @*<th>Contact ID</th>*@
+            <th>Contact Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach( var item in Model.listAssetFull)
+        {
+            <tr>
+                <td class="Keyid">@item.Keyid</td>
+                <td>@item.nCentralId</td>
+                <td>@item.companyName</td>
+                <td>@item.assetName</td>
+                <td>@item.currentSync</td>
+                <td>@item.lastSync</td>
+                @*<td>@item.contactId</td>*@
+                <td>@item.contactName</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="/Asset/Edit?Keyid=@item.Keyid">Edit</a>
+                    <a class="btn btn-danger btn-sm" href="/Asset/Filter?Keyid=@item.Keyid">Ignore</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <th class="Keyid_hdr">Key ID</th>
+            <th>N-Central ID</th>
+            <th>Company Name</th>
+            <th>Asset Name</th>
+            <th>Current Sync User</th>
+            <th>Last Sync User</th>
+            @*<th>Contact ID</th>*@
+            <th>Contact Name</th>
+            <th></th>
+        </tr>
+    </tfoot>
+</table>
+
+<script>
+     let table = new DataTable('#Asset', 
+     {
+        columns: [
+            { data: 'KeyID' },
+            { data: 'nCentralId' },
+            { data: 'companyName' },
+            { data: 'assetName' },
+            { data: 'currentSync'},
+            { data: 'lastSync' },
+            //{ data: 'contactId' },
+            { data: 'contactName'},
+            {}
+        ],
+        order: [[2, 'asc']],
+        pageLength: 75,
+        lengthMenu: [
+        [10, 25, 50, 75], // Values
+        [10, 25, 50, 75] // Labels
+        ],
+        rowCallback: function(row, data) 
+        {
+            // Check if the contactId column contains the string "0"
+            if (data.contactName.toString().includes("No Match")) 
+            {
+                    $(row).css('background-color', 'rgb(255, 0, 0)'); // Change the color to red
+            }
+            else if (data.contactName.toString().includes("Multiple Match"))
+            {
+                    $(row).css('background-color', 'rgb(255, 255, 0)'); // Change the color to yellow
+            }
+        }
+    });
+</script>
+
+<style>
+    table, td, th {
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th.Keyid_hdr, td.Keyid {
+        display: none;
+    }
+</style>
