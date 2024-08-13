@@ -52,7 +52,7 @@
         <label class="col-sm-3 col-form-label">Contact Name:</label>
         <div class="col-sm-6">
             <select id="contacts" name= "COID" class="form-control" style="width: 100%;">
-                <option value="">- Please select a Contact -</option>
+                <option value="No Match">- Please select a Contact -</option>
                 @if (Model.contacts != null && Model.contacts.Any())
                 {
                     foreach (var role in Model.contacts)
@@ -90,7 +90,7 @@ else
 <script>
     $(document).ready(function () {
         $('#contacts').chosen({
-            placeholder_text_single: "- Please select a Contact -",
+            placeholder_text_single: "a",
             width: '100%'
         });
         var selectedValue = $(this).val(); // Get the selected value

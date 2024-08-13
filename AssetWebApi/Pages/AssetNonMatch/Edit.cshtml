@@ -52,7 +52,7 @@
         <label class="col-sm-3 col-form-label">Contact Name:</label>
         <div class="col-sm-6">
             <select id="contacts" name= "COID" class="form-control" style="width: 100%;">
-                <option value="">- Please select a Contact -</option>
+                <option value="No Match">- Please select a Contact -</option>
                 @if (Model.contacts != null && Model.contacts.Any())
                 {
                     foreach (var role in Model.contacts)

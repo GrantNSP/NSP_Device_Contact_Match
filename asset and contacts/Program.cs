@@ -110,9 +110,9 @@ namespace assetsAndContacts
             using (SqlConnection connWarehouse = new SqlConnection(connStringWarehouse))
             {
                 connWarehouse.Open();
-                //SqlCommand cmd = new SqlCommand("SELECT c1.[customerid],c1.[customername],c1.[psacustomername] FROM [ods_smarti_ds1].[dbo].[customer] c1 LEFT JOIN [ods_smarti_ds1].[dbo].customer c2 ON c1.parentid = c2.customerid WHERE c1.deleted = 0 AND c1.psacustomername != '' and c1.parentid != 257 and c1.parentid != 392 and c1.[parentid] != 1 and c2.parentid != 392 and c1.customerid != 254 AND c1.customerid !=341 AND c1.customerid != 257 AND c1.parentid != 229 ORDER BY c1.customerName ASC", connWarehouse);
+                SqlCommand cmd = new SqlCommand("SELECT c1.[customerid],c1.[customername],c1.[psacustomername] FROM [ods_smarti_ds1].[dbo].[customer] c1 LEFT JOIN [ods_smarti_ds1].[dbo].customer c2 ON c1.parentid = c2.customerid WHERE c1.deleted = 0 AND c1.psacustomername != '' and c1.parentid != 257 and c1.parentid != 392 and c1.[parentid] != 1 and c2.parentid != 392 and c1.customerid != 254 AND c1.customerid !=341 AND c1.customerid != 257 AND c1.parentid != 229 ORDER BY c1.customerName ASC", connWarehouse);
                 //SqlCommand cmd = new SqlCommand("SELECT c1.[customerid],c1.[customername],c1.[psacustomername] FROM [ods_smarti_ds1].[dbo].[customer] c1 LEFT JOIN [ods_smarti_ds1].[dbo].customer c2 ON c1.parentid = c2.customerid WHERE c1.deleted = 0 AND c1.psacustomername != '' and c1.parentid != 257 and c1.parentid != 392 and c1.[parentid] != 1 and c2.parentid != 392 and c1.customerid != 254 AND c1.customerid !=341 AND c1.customerid != 257 AND c1.parentid != 229 AND (c1.customername LIKE '%Betta%' OR c1.customername LIKE '%Antipodes%')", connWarehouse);
-                SqlCommand cmd = new SqlCommand("SELECT c1.[customerid],c1.[customername],c1.[psacustomername] FROM [ods_smarti_ds1].[dbo].[customer] c1 LEFT JOIN [ods_smarti_ds1].[dbo].customer c2 ON c1.parentid = c2.customerid WHERE c1.deleted = 0 AND c1.psacustomername != '' and c1.parentid != 257 and c1.parentid != 392 and c1.[parentid] != 1 and c2.parentid != 392 and c1.customerid != 254 AND c1.customerid !=341 AND c1.customerid != 257 AND c1.parentid != 229 AND (c1.customername LIKE '%Antipodes%' OR c1.customername LIKE '%Corban%')", connWarehouse);
+                //SqlCommand cmd = new SqlCommand("SELECT c1.[customerid],c1.[customername],c1.[psacustomername] FROM [ods_smarti_ds1].[dbo].[customer] c1 LEFT JOIN [ods_smarti_ds1].[dbo].customer c2 ON c1.parentid = c2.customerid WHERE c1.deleted = 0 AND c1.psacustomername != '' and c1.parentid != 257 and c1.parentid != 392 and c1.[parentid] != 1 and c2.parentid != 392 and c1.customerid != 254 AND c1.customerid !=341 AND c1.customerid != 257 AND c1.parentid != 229 AND (c1.customername LIKE '%Antipodes%' OR c1.customername LIKE '%Corban%' OR c1.customername LIKE '%Italia%' OR c1.customername LIKE '%Fencible%')", connWarehouse);
 
                 using (SqlDataReader reader1 = cmd.ExecuteReader())
                 {
@@ -468,21 +468,21 @@ namespace assetsAndContacts
 
                     var stringContent = new StringContent(stringJson, Encoding.UTF8, "application/json");
 
-                    //string assetUrl = "https://webservices6.autotask.net/ATServicesRest/V1.0/ConfigurationItems";
+                    string assetUrl = "https://webservices6.autotask.net/ATServicesRest/V1.0/ConfigurationItems";
 
-                    //response2 = await client.PatchAsync(assetUrl, stringContent);
+                    response2 = await client.PatchAsync(assetUrl, stringContent);
 
-                    //content2 = await response2.Content.ReadAsStringAsync();
+                    content2 = await response2.Content.ReadAsStringAsync();
 
-                    //if (response2.IsSuccessStatusCode)
-                    //{
-                    //    LogToFile(assetName + " succesfully updated in Autotask with contact " + firstName + " " + lastName);
-                    //}
-                    //else
-                    //{
-                    //    LogToFile(assetName + " failed to update");
-                    //    LogToFile(content2);
-                    //}
+                    if (response2.IsSuccessStatusCode)
+                    {
+                        LogToFile(assetName + " succesfully updated in Autotask with contact " + firstName + " " + lastName);
+                    }
+                    else
+                    {
+                        LogToFile(assetName + " failed to update");
+                        LogToFile(content2);
+                    }
                 }
                 else
                 {

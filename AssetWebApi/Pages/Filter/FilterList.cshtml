@@ -14,9 +14,9 @@
     <thead>
         <tr>
             <th class="Keyid_hdr">Key ID</th>
-            <th>N-Central ID</th>
+            @*<th>N-Central ID</th>*@
             <th>Company Name</th>
-            <th>Asset Name</th>
+            <th>Device Name</th>
             <th></th>
         </tr>
     </thead>
@@ -25,7 +25,7 @@
         {
             <tr>
                 <td class="Keyid">@item.Keyid</td>
-                <td>@item.nCentralId</td>
+                @*<td>@item.nCentralId</td>*@
                 <td>@item.companyName</td>
                 <td>@item.assetName</td>
                 <td>
@@ -37,9 +37,9 @@
     <tfoot>
         <tr>
             <th class="Keyid_hdr">Key ID</th>
-            <th>N-Central ID</th>
+            @*<th>N-Central ID</th>*@
             <th>Company Name</th>
-            <th>Asset Name</th>
+            <th>Device Name</th>
             <th></th>
         </tr>
     </tfoot>
@@ -50,12 +50,14 @@
      {
         columns: [
             { data: 'KeyID' },
-            { data: 'nCentralId' },
+            //{ data: 'nCentralId' },
             { data: 'companyName' },
             { data: 'assetName' },
             {}
         ],
-        order: [[2, 'asc']],
+        stateSave: true,
+        stateDuration: -1,
+        order: [[1, 'asc']],
         pageLength: 75,
         lengthMenu: [
         [10, 25, 50, 75], // Values

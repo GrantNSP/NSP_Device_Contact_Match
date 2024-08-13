@@ -14,14 +14,14 @@
     <thead>
         <tr>
             <th class="Keyid_hdr">Key ID</th>
-            <th>N-Central ID</th>
+            @*<th>N-Central ID</th>*@
             <th>Company Name</th>
-            <th>Asset Name</th>
-            <th>Current Sync User</th>
-            <th>Last Sync User</th>
+            <th>Device Name</th>
+            <th>Current Login User</th>
+            <th>Last Login User</th>
             @*<th>Contact ID</th>*@
             <th>Contact Name</th>
-            <th></th>
+            <th class="Button_hdr"></th>
         </tr>
     </thead>
     <tbody>
@@ -29,14 +29,14 @@
         {
             <tr>
                 <td class="Keyid">@item.Keyid</td>
-                <td>@item.nCentralId</td>
+               @* <td>@item.nCentralId</td>*@
                 <td>@item.companyName</td>
                 <td>@item.assetName</td>
                 <td>@item.currentSync</td>
                 <td>@item.lastSync</td>
                 @*<td>@item.contactId</td>*@
                 <td>@item.contactName</td>
-                <td>
+                <td class="Button">
                     <a class="btn btn-primary btn-sm" href="/Asset/Edit?Keyid=@item.Keyid">Edit</a>
                     <a class="btn btn-danger btn-sm" href="/Asset/Filter?Keyid=@item.Keyid">Ignore</a>
                 </td>
@@ -46,14 +46,14 @@
     <tfoot>
         <tr>
             <th class="Keyid_hdr">Key ID</th>
-            <th>N-Central ID</th>
+            @*<th>N-Central ID</th>*@
             <th>Company Name</th>
-            <th>Asset Name</th>
-            <th>Current Sync User</th>
-            <th>Last Sync User</th>
+            <th>Device Name</th>
+            <th>Current Login User</th>
+            <th>Last Login User</th>
             @*<th>Contact ID</th>*@
             <th>Contact Name</th>
-            <th></th>
+            <th class="Button_hdr"></th>
         </tr>
     </tfoot>
 </table>
@@ -63,7 +63,7 @@
      {
         columns: [
             { data: 'KeyID' },
-            { data: 'nCentralId' },
+            //{ data: 'nCentralId' },
             { data: 'companyName' },
             { data: 'assetName' },
             { data: 'currentSync'},
@@ -72,7 +72,9 @@
             { data: 'contactName'},
             {}
         ],
-        order: [[2, 'asc']],
+        stateSave: true,
+        stateDuration: -1,
+        order: [[1, 'asc']],
         pageLength: 75,
         lengthMenu: [
         [10, 25, 50, 75], // Values
@@ -105,5 +107,8 @@
     }
     th.Keyid_hdr, td.Keyid {
         display: none;
+    }
+    th.Button_hdr,td.Button {
+        min-width: 115px;
     }
 </style>

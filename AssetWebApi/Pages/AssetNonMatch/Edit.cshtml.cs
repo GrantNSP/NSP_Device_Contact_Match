@@ -20,7 +20,7 @@ namespace assetWebApi.Pages.AssetNonMatch
 
         [Display(Name = "User Role")]
         public int SelectedUserRoleId { get; set; }
-        public IEnumerable<SelectListItem> contacts { get; set; }
+        public IEnumerable<SelectListItem>? contacts { get; set; }
         public void OnGet()
         {
             string Keyid = Request.Query["Keyid"];
@@ -63,7 +63,7 @@ namespace assetWebApi.Pages.AssetNonMatch
             }
 
             // put contacts in an inumerable list
-            contacts = GeContacts();
+            contacts = GetContacts();
         }
 
         private async Task getData(string companyId)
@@ -98,16 +98,18 @@ namespace assetWebApi.Pages.AssetNonMatch
             }
         }
 
-        private IEnumerable<SelectListItem> GeContacts()
+        private IEnumerable<SelectListItem> GetContacts()
         {
-            var roles = new List<SelectListItem>();
+            var contacts = new List<SelectListItem>();
 
             for (int i = 0; i < contactData.items.Count; i++)
             {
-                roles.Add(new SelectListItem { Value = contactData.items[i].id, Text = contactData.items[i].firstName + " " + contactData.items[i].lastName });
+                contacts.Add(new SelectListItem { Value = contactData.items[i].id, Text = contactData.items[i].firstName + " " + contactData.items[i].lastName });
             }
 
-            return roles;
+            List<SelectListItem> sortedContacts = contacts.OrderBy(p => p.Text).ToList();
+
+            return sortedContacts;
         }
 
         private async Task sendData(string contactId, string nCentralAssetId)
@@ -200,7 +202,16 @@ namespace assetWebApi.Pages.AssetNonMatch
 
             assetInput.nCentralId = Request.Form["NCID"];
 
-            sendData(assetInput.contactId, assetInput.nCentralId).Wait();
+
+            if (!assetInput.contactId.Equals("No Match"))
+            {
+                sendData(assetInput.contactId, assetInput.nCentralId).Wait();
+            }
+            else
+            {
+                assetInput.contactId = "0";
+                name = "No Match";
+            }
 
             try
             {
