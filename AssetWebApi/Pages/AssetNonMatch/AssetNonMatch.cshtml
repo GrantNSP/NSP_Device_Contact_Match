@@ -91,7 +91,18 @@
             {
                 $(row).css('background-color', 'yellow');
             }
+            else if (data.contactName.toString().includes("Conflict"))
+            {
+                $(row).css('background-color', 'rgb(38, 247, 253)');
+            }
         }
+    });
+
+     table.on('page.dt', function() 
+    {
+        $('html, body').animate({
+            scrollTop: $(".dataTables_wrapper").offset().top
+        }, 'slow');
     });
 </script>
 

@@ -279,6 +279,23 @@ namespace assetsAndContacts
                                                         }
                                                         else
                                                         {
+                                                            string lUser = "";
+
+                                                            cmd3 = new SqlCommand("SELECT [LastSyncUser] FROM [Asset].[dbo].[AssetContact] WHERE [N-Central ID] = " + autotaskCompanyId, connAsset);
+                                                            using (SqlDataReader reader5 = cmd3.ExecuteReader())
+                                                            {
+                                                                while (reader5.Read())
+                                                                {
+                                                                    lUser = reader5.GetString(0);
+                                                                }
+                                                            }
+
+                                                            if (!lUser.Equals("No Previous Sync"))
+                                                            {
+                                                                cmd3 = new SqlCommand("UPDATE [Asset].[dbo].[AssetContact] SET [ContactID] = '0', [ContactName] = 'Conflict' WHERE [N-Central ID] = " + nCentralAssetId, connAsset);
+                                                                cmd3.ExecuteNonQuery();
+                                                            }
+
                                                             Console.WriteLine(currentSyncUser + " has no match");
                                                             LogToFile(currentSyncUser + " has no match");
                                                         }
